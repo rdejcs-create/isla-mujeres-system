@@ -1,0 +1,59 @@
+/*
+=====================================================
+ESTILOS GENERALES DEL SISTEMA
+AGI TOURS & TRANSFERS
+=====================================================
+Este archivo controla el estilo base de toda la app.
+*/
+
+/* Reset básico del navegador */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilo general de la página */
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #130cf2;
+  color: #fefefe;
+}
+
+/* Contenedor raíz donde React monta la app */
+
+#root {
+  width: 100%;
+}
+
+/* Estilos generales de inputs */
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* Mejor apariencia al enfocar un campo */
+
+input:focus {
+  outline: none;
+  border-color: #0077cc;
+}
+
+/* Botones */
+
+button {
+  font-size: 16px;
+}
+
+/* Encabezados */
+
+h1, h2, h3 {
+  color: #222;
+}
