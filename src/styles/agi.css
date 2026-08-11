@@ -1,0 +1,1008 @@
+/* =========================================================
+   AGI MOBILITY PLATFORM
+   Visual Design System
+   ========================================================= */
+
+
+/* =========================================================
+   1. GLOBAL VARIABLES
+   ========================================================= */
+
+:root {
+
+  --agi-blue: #0077a8;
+  --agi-blue-dark: #005b82;
+  --agi-turquoise: #00a7b5;
+
+  --agi-accent: #f2a900;
+  --agi-accent-dark: #d98f00;
+
+  --agi-white: #ffffff;
+  --agi-light: #f4f8fa;
+  --agi-gray: #64748b;
+  --agi-dark: #17324d;
+
+  --agi-border: #d9e2e8;
+
+  --agi-shadow:
+    0 12px 35px rgba(0, 45, 70, 0.18);
+
+  --agi-radius: 14px;
+
+  --agi-transition:
+    0.2s ease;
+
+}
+
+
+/* =========================================================
+   2. GLOBAL RESET
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+body {
+
+  margin: 0;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  color: var(--agi-dark);
+
+  background:
+    #eef5f7;
+
+  line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   3. MAIN APPLICATION BACKGROUND
+   ========================================================= */
+
+.agi-app {
+
+  min-height: 100vh;
+
+  background-image:
+    linear-gradient(
+      rgba(0, 50, 75, 0.48),
+      rgba(0, 50, 75, 0.48)
+    ),
+    url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=85");
+
+  background-size: cover;
+
+  background-position: center;
+
+  background-attachment: fixed;
+
+  padding:
+    30px
+    20px
+    60px;
+
+}
+
+
+/* =========================================================
+   4. MAIN HEADER
+   ========================================================= */
+
+.agi-header {
+
+  max-width: 900px;
+
+  margin:
+    0 auto
+    30px;
+
+  text-align: center;
+
+  color:
+    var(--agi-white);
+
+}
+
+
+.agi-header h1 {
+
+  margin:
+    0 0 8px;
+
+  font-size:
+    clamp(1.8rem, 5vw, 3rem);
+
+  font-weight:
+    700;
+
+  letter-spacing:
+    0.04em;
+
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.35);
+
+}
+
+
+.agi-header p {
+
+  margin: 0;
+
+  font-size:
+    clamp(0.9rem, 2vw, 1.15rem);
+
+  letter-spacing:
+    0.05em;
+
+  opacity:
+    0.95;
+
+}
+
+
+/* =========================================================
+   5. PRODUCT CONTAINER
+   ========================================================= */
+
+.agi-card {
+
+  width: 100%;
+
+  max-width: 720px;
+
+  margin:
+    0 auto;
+
+  padding:
+    30px;
+
+  background:
+    rgba(255, 255, 255, 0.97);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.8);
+
+  border-radius:
+    var(--agi-radius);
+
+  box-shadow:
+    var(--agi-shadow);
+
+}
+
+
+/* =========================================================
+   6. PRODUCT TITLE
+   ========================================================= */
+
+.agi-card h2 {
+
+  margin:
+    0 0 10px;
+
+  color:
+    var(--agi-blue-dark);
+
+  font-size:
+    1.55rem;
+
+}
+
+
+.agi-card > p {
+
+  color:
+    var(--agi-gray);
+
+}
+
+
+/* =========================================================
+   7. SECTION HEADINGS
+   ========================================================= */
+
+.agi-card h3 {
+
+  margin:
+    28px 0 12px;
+
+  padding-bottom:
+    7px;
+
+  color:
+    var(--agi-blue);
+
+  font-size:
+    1rem;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    0.04em;
+
+  border-bottom:
+    2px solid
+    var(--agi-light);
+
+}
+
+
+/* =========================================================
+   8. LABELS
+   ========================================================= */
+
+.agi-card label {
+
+  display: block;
+
+  margin:
+    7px 0;
+
+  color:
+    var(--agi-dark);
+
+  font-weight:
+    500;
+
+}
+
+
+/* =========================================================
+   9. INPUTS
+   ========================================================= */
+
+.agi-card input,
+.agi-card select,
+.agi-card textarea {
+
+  width: 100%;
+
+  margin:
+    5px 0 10px;
+
+  padding:
+    12px 13px;
+
+  font-family:
+    inherit;
+
+  font-size:
+    1rem;
+
+  color:
+    var(--agi-dark);
+
+  background:
+    var(--agi-white);
+
+  border:
+    1px solid
+    var(--agi-border);
+
+  border-radius:
+    8px;
+
+  outline: none;
+
+  transition:
+    border-color var(--agi-transition),
+    box-shadow var(--agi-transition);
+
+}
+
+
+.agi-card input:focus,
+.agi-card select:focus,
+.agi-card textarea:focus {
+
+  border-color:
+    var(--agi-turquoise);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(0, 167, 181, 0.12);
+
+}
+
+
+/* =========================================================
+   10. RADIO BUTTONS AND CHECKBOXES
+   ========================================================= */
+
+.agi-card input[type="radio"],
+.agi-card input[type="checkbox"] {
+
+  width:
+    auto;
+
+  margin:
+    0 7px 0 0;
+
+  padding:
+    0;
+
+  accent-color:
+    var(--agi-blue);
+
+}
+
+
+/* =========================================================
+   11. TRIP TYPE
+   ========================================================= */
+
+.agi-trip-type {
+
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    10px;
+
+}
+
+
+.agi-trip-option {
+
+  flex:
+    1 1 160px;
+
+  padding:
+    12px 15px;
+
+  background:
+    var(--agi-light);
+
+  border:
+    1px solid
+    var(--agi-border);
+
+  border-radius:
+    8px;
+
+  cursor:
+    pointer;
+
+}
+
+
+.agi-trip-option:hover {
+
+  border-color:
+    var(--agi-turquoise);
+
+}
+
+
+/* =========================================================
+   12. PRICE
+   ========================================================= */
+
+.agi-total {
+
+  margin:
+    30px 0 20px;
+
+  padding:
+    18px;
+
+  text-align:
+    center;
+
+  background:
+    var(--agi-light);
+
+  border-radius:
+    10px;
+
+}
+
+
+.agi-total-label {
+
+  display:
+    block;
+
+  color:
+    var(--agi-gray);
+
+  font-size:
+    0.9rem;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    0.05em;
+
+}
+
+
+.agi-total-price {
+
+  display:
+    block;
+
+  margin-top:
+    4px;
+
+  color:
+    var(--agi-blue-dark);
+
+  font-size:
+    2rem;
+
+  font-weight:
+    700;
+
+}
+
+
+/* =========================================================
+   13. PRIMARY BUTTON
+   ========================================================= */
+
+.agi-primary-button {
+
+  width:
+    100%;
+
+  margin-top:
+    10px;
+
+  padding:
+    15px 20px;
+
+  color:
+    var(--agi-white);
+
+  background:
+    var(--agi-blue);
+
+  border:
+    none;
+
+  border-radius:
+    9px;
+
+  font-family:
+    inherit;
+
+  font-size:
+    1rem;
+
+  font-weight:
+    700;
+
+  cursor:
+    pointer;
+
+  transition:
+    background var(--agi-transition),
+    transform var(--agi-transition),
+    box-shadow var(--agi-transition);
+
+}
+
+
+.agi-primary-button:hover {
+
+  background:
+    var(--agi-blue-dark);
+
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 5px 15px
+    rgba(0, 91, 130, 0.25);
+
+}
+
+
+.agi-primary-button:active {
+
+  transform:
+    translateY(0);
+
+}
+
+
+.agi-primary-button:disabled {
+
+  opacity:
+    0.6;
+
+  cursor:
+    not-allowed;
+
+  transform:
+    none;
+
+}
+
+
+/* =========================================================
+   14. ERROR MESSAGE
+   ========================================================= */
+
+.agi-error {
+
+  margin:
+    15px 0;
+
+  padding:
+    12px 15px;
+
+  color:
+    #9f1239;
+
+  background:
+    #fff1f2;
+
+  border:
+    1px solid
+    #fecdd3;
+
+  border-radius:
+    8px;
+
+  font-weight:
+    600;
+
+}
+
+
+/* =========================================================
+   15. INFORMATION / DISCLAIMER
+   ========================================================= */
+
+.agi-note {
+
+  margin-top:
+    15px;
+
+  color:
+    var(--agi-gray);
+
+  font-size:
+    0.85rem;
+
+  text-align:
+    center;
+
+}
+
+
+/* =========================================================
+   16. FOOTER
+   ========================================================= */
+
+.agi-footer {
+
+  max-width:
+    720px;
+
+  margin:
+    25px auto 0;
+
+  color:
+    rgba(255, 255, 255, 0.85);
+
+  text-align:
+    center;
+
+  font-size:
+    0.8rem;
+
+}
+
+
+/* =========================================================
+   17. MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .agi-app {
+
+    padding:
+      20px
+      12px
+      40px;
+
+    background-attachment:
+      scroll;
+
+  }
+
+
+  .agi-card {
+
+    padding:
+      22px 18px;
+
+    border-radius:
+      11px;
+
+  }
+
+
+  .agi-header {
+
+    margin-bottom:
+      20px;
+
+  }
+
+
+  .agi-card h2 {
+
+    font-size:
+      1.35rem;
+
+  }
+
+
+  .agi-card h3 {
+
+    margin-top:
+      23px;
+
+  }
+
+
+  .agi-trip-type {
+
+    display:
+      block;
+
+  }
+
+
+  .agi-trip-option {
+
+    margin-bottom:
+      8px;
+
+  }
+
+
+  .agi-total-price {
+
+    font-size:
+      1.75rem;
+
+  }
+
+}
+
+
+/* =========================================================
+   18. REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  * {
+
+    scroll-behavior:
+      auto !important;
+
+    transition:
+      none !important;
+
+  }
+
+}
+
+
+/* =========================================================
+   19. LANDING PAGE
+   ========================================================= */
+
+.agi-landing {
+
+  max-width:
+    1000px;
+
+  margin:
+    0 auto;
+
+}
+
+
+.agi-landing-intro {
+
+  margin:
+    0 auto 30px;
+
+  padding:
+    25px;
+
+  text-align:
+    center;
+
+  color:
+    var(--agi-white);
+
+}
+
+
+.agi-landing-intro h2 {
+
+  margin:
+    0 0 8px;
+
+  font-size:
+    clamp(1.5rem, 4vw, 2.2rem);
+
+  text-shadow:
+    0 2px 6px
+    rgba(0, 0, 0, 0.3);
+
+}
+
+
+.agi-landing-intro p {
+
+  margin:
+    0;
+
+  font-size:
+    1rem;
+
+  opacity:
+    0.95;
+
+}
+
+
+/* =========================================================
+   20. PRODUCT GRID
+   ========================================================= */
+
+.agi-product-grid {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap:
+    25px;
+
+}
+
+
+/* =========================================================
+   21. PRODUCT CARD
+   ========================================================= */
+
+.agi-product-card {
+
+  overflow:
+    hidden;
+
+  background:
+    rgba(255, 255, 255, 0.97);
+
+  border-radius:
+    var(--agi-radius);
+
+  box-shadow:
+    var(--agi-shadow);
+
+  transition:
+    transform var(--agi-transition),
+    box-shadow var(--agi-transition);
+
+}
+
+
+.agi-product-card:hover {
+
+  transform:
+    translateY(-4px);
+
+  box-shadow:
+    0 18px 40px
+    rgba(0, 45, 70, 0.24);
+
+}
+
+
+/* =========================================================
+   22. PRODUCT IMAGE
+   ========================================================= */
+
+.agi-product-image {
+
+  min-height:
+    230px;
+
+  display:
+    flex;
+
+  align-items:
+    flex-end;
+
+  background-size:
+    cover;
+
+  background-position:
+    center;
+
+}
+
+
+.agi-isla-image {
+
+  background-image:
+    url("/images/isla-mujeres-express.jpg");
+
+}
+
+
+.agi-personalized-image {
+
+  background-image:
+    url("/images/personalized-transportation.jpg");
+
+}
+
+
+/* =========================================================
+   23. IMAGE OVERLAY
+   ========================================================= */
+
+.agi-product-overlay {
+
+  width:
+    100%;
+
+  padding:
+    45px 20px 18px;
+
+  color:
+    var(--agi-white);
+
+  background:
+    linear-gradient(
+      transparent,
+      rgba(0, 35, 55, 0.85)
+    );
+
+}
+
+
+.agi-product-overlay h2 {
+
+  margin:
+    0;
+
+  font-size:
+    1.25rem;
+
+  letter-spacing:
+    0.03em;
+
+}
+
+
+/* =========================================================
+   24. PRODUCT CONTENT
+   ========================================================= */
+
+.agi-product-content {
+
+  padding:
+    22px;
+
+}
+
+
+.agi-product-description {
+
+  min-height:
+    58px;
+
+  margin:
+    0 0 18px;
+
+  color:
+    var(--agi-gray);
+
+}
+
+
+/* =========================================================
+   25. NAVIGATION
+   ========================================================= */
+
+.agi-navigation {
+
+  max-width:
+    720px;
+
+  margin:
+    0 auto 15px;
+
+}
+
+
+.agi-back-button {
+
+  padding:
+    8px 0;
+
+  color:
+    var(--agi-white);
+
+  background:
+    transparent;
+
+  border:
+    none;
+
+  font-family:
+    inherit;
+
+  font-size:
+    0.95rem;
+
+  cursor:
+    pointer;
+
+}
+
+
+.agi-back-button:hover {
+
+  text-decoration:
+    underline;
+
+}
+
+
+/* =========================================================
+   26. MOBILE LANDING
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .agi-product-grid {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  .agi-product-image {
+
+    min-height:
+      200px;
+
+  }
+
+}

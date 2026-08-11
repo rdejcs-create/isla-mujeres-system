@@ -1,24 +1,22 @@
 /*
 ====================================================
-TABLA DE TARIFAS
+TABLA DE TARIFAS - PRICING CONFIGURATION
 AGI Tours & Transfers
 ====================================================
 Aquí se definen todos los precios del sistema.
 Si cambian las tarifas solo se modifica este archivo.
+====================================================
+Todas las tarifas del sistema centralizadas.
 */
 
-export const PRICING = {
+export const VIP_PRICING = {
+  oneway: 65,
+  round: 109
+};
 
-  VIP: {
-    oneWay: 65,
-    roundTrip: 109
-  },
-
-  PLATINUM: {
-    baseOneWay: 500,
-    baseRoundTrip: 950,
-    extraPassengerOneWay: 60,
-    extraPassengerRoundTrip: 100
-  }
-
+export const PLATINUM_PRICING = {
+  base_oneway: 500,
+  base_round: 950,
+  extra_oneway: 60,
+  extra_round: 100
 };

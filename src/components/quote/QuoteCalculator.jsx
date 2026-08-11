@@ -1,465 +1,946 @@
-import React, { useState } from "react";
-import { PRICING } from "../../data/pricing";
+import React, { useState, useEffect } from "react";
+import {
+  VIP_PRICING,
+  PLATINUM_PRICING
+} from "../../data/pricing";
+import {
+  buildWhatsAppMessage
+} from "../../utils/whatsappMessage";
 
 /*
-====================================================
-COMPONENTE VISUAL PARA TARJETAS
-====================================================
-Se usa para organizar el formulario en bloques
-claros tipo aplicación de reservas.
-*/
+ * =========================================================
+ * AGI MOBILITY PLATFORM
+ * ISLA MUJERES EXPRESS
+ * =========================================================
+ *
+ * Automatic quotation product.
+ *
+ * Pricing:
+ *
+ * VIP
+ *   One Way   = $65 pp
+ *   Round Trip = $109 pp
+ *
+ * PLATINUM
+ *   One Way:
+ *     1–4 passengers = $500
+ *     additional passenger = $60
+ *
+ *   Round Trip:
+ *     1–4 passengers = $950
+ *     additional passenger = $100
+ *
+ * IMPORTANT:
+ * Round Trip is NOT calculated by multiplying
+ * the One Way price by two.
+ */
 
-function SectionCard({ title, children }) {
-  return (
-    <div
-      style={{
-        background: "#ffffff",
-        padding: "20px",
-        borderRadius: "10px",
-        marginBottom: "20px",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
-      }}
-    >
-      <h3
-        style={{
-          marginBottom: "15px",
-          borderBottom: "1px solid #eee",
-          paddingBottom: "8px"
-        }}
-      >
-        {title}
-      </h3>
+// =========================================================
+// GOOGLE APPS SCRIPT API
+// =========================================================
 
-      {children}
-    </div>
-  );
-}
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbyp9uoH100kAUxfKjx4sI6fOnt38FIjZYl-5OgjThh0Q636CXW3LSKz900kCO8zLzPK/exec";
 
-/*
-====================================================
-COMPONENTE PRINCIPAL DEL COTIZADOR
-====================================================
-*/
+
+// =========================================================
+// MAIN COMPONENT
+// =========================================================
 
 export default function QuoteCalculator() {
 
-  /*
-  ====================================================
-  FECHA AUTOMÁTICA DE SOLICITUD
-  ====================================================
-  */
+  // =======================================================
+  // SERVICE
+  // =======================================================
 
-  const requestDate = new Date().toLocaleString();
+  const [serviceType, setServiceType] =
+    useState("VIP");
 
-  /*
-  ====================================================
-  DATOS DEL PASAJERO
-  ====================================================
-  */
+  const [roundTrip, setRoundTrip] =
+    useState(false);
 
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [passengers, setPassengers] = useState(1);
-  const [babySeat, setBabySeat] = useState(false);
 
-  /*
-  ====================================================
-  TIPO DE SERVICIO
-  ====================================================
-  VIP o PLATINUM
-  */
+  // =======================================================
+  // PASSENGER INFORMATION
+  // =======================================================
 
-  const [serviceType, setServiceType] = useState("VIP");
+  const [fullName, setFullName] =
+    useState("");
 
-  /*
-  ====================================================
-  TIPO DE VIAJE
-  ====================================================
-  */
+  const [phone, setPhone] =
+    useState("");
 
-  const [roundTrip, setRoundTrip] = useState(false);
+  const [email, setEmail] =
+    useState("");
 
-  /*
-  ====================================================
-  INFORMACIÓN DE LLEGADA
-  ====================================================
-  */
+  const [passengers, setPassengers] =
+    useState(1);
 
-  const [arrivalDate, setArrivalDate] = useState("");
-  const [arrivalTime, setArrivalTime] = useState("");
-  const [arrivalAirline, setArrivalAirline] = useState("");
-  const [arrivalFlight, setArrivalFlight] = useState("");
-  const [arrivalOrigin, setArrivalOrigin] = useState("");
-  const [destination, setDestination] = useState("");
+  const [babySeat, setBabySeat] =
+    useState(false);
 
-  /*
-  ====================================================
-  INFORMACIÓN DE SALIDA
-  ====================================================
-  SOLO SI EL VIAJE ES REDONDO
-  */
 
-  const [departureDate, setDepartureDate] = useState("");
-  const [departureTime, setDepartureTime] = useState("");
-  const [departureAirline, setDepartureAirline] = useState("");
-  const [departureFlight, setDepartureFlight] = useState("");
+  // =======================================================
+  // OUTBOUND / ARRIVAL
+  // =======================================================
 
-  /*
-  ====================================================
-  FUNCIÓN PRINCIPAL DE CÁLCULO
-  ====================================================
-  Usa las tarifas definidas en pricing.js
-  */
+  const [arrivalDate, setArrivalDate] =
+    useState("");
 
-  const calculateTotal = () => {
+  const [arrivalTime, setArrivalTime] =
+    useState("");
 
-    if (!passengers || passengers < 1) return 0;
+  const [arrivalAirline, setArrivalAirline] =
+    useState("");
 
-    let total = 0;
+  const [arrivalFlight, setArrivalFlight] =
+    useState("");
 
-    /*
-    ==========================================
-    SERVICIO VIP
-    ==========================================
-    */
+  const [arrivalOrigin, setArrivalOrigin] =
+    useState("");
+
+
+  // =======================================================
+  // DESTINATION IN ISLA MUJERES
+  // =======================================================
+
+  const [destination, setDestination] =
+    useState("");
+
+
+  // =======================================================
+  // RETURN TRIP
+  // =======================================================
+
+  const [departureDate, setDepartureDate] =
+    useState("");
+
+  const [departureTime, setDepartureTime] =
+    useState("");
+
+  const [departureAirline, setDepartureAirline] =
+    useState("");
+
+  const [departureFlight, setDepartureFlight] =
+    useState("");
+
+
+  // =======================================================
+  // PRICE / STATUS
+  // =======================================================
+
+  const [totalPrice, setTotalPrice] =
+    useState(0);
+
+  const [errorMessage, setErrorMessage] =
+    useState("");
+
+  const [isSending, setIsSending] =
+    useState(false);
+
+
+  // =======================================================
+  // PRICE CALCULATION
+  // =======================================================
+
+  useEffect(() => {
+
+    let price = 0;
+
+
+    // -----------------------------------------------------
+    // VIP
+    // -----------------------------------------------------
 
     if (serviceType === "VIP") {
 
-      if (!roundTrip) {
-        total = passengers * PRICING.VIP.oneWay;
-      } else {
-        total = passengers * PRICING.VIP.roundTrip;
-      }
-
+      price = roundTrip
+        ? passengers * VIP_PRICING.round
+        : passengers * VIP_PRICING.oneway;
     }
 
-    /*
-    ==========================================
-    SERVICIO PLATINUM
-    ==========================================
-    */
+
+    // -----------------------------------------------------
+    // PLATINUM
+    // -----------------------------------------------------
 
     if (serviceType === "PLATINUM") {
 
-      if (!roundTrip) {
+      if (passengers <= 4) {
 
-        if (passengers <= 4) {
-          total = PRICING.PLATINUM.baseOneWay;
-        } else {
-
-          const extraPassengers = passengers - 4;
-
-          total =
-            PRICING.PLATINUM.baseOneWay +
-            extraPassengers * PRICING.PLATINUM.extraPassengerOneWay;
-
-        }
+        price = roundTrip
+          ? PLATINUM_PRICING.base_round
+          : PLATINUM_PRICING.base_oneway;
 
       } else {
 
-        if (passengers <= 4) {
-          total = PRICING.PLATINUM.baseRoundTrip;
-        } else {
+        const extra =
+          passengers - 4;
 
-          const extraPassengers = passengers - 4;
+        price = roundTrip
+          ? PLATINUM_PRICING.base_round +
+            extra *
+            PLATINUM_PRICING.extra_round
 
-          total =
-            PRICING.PLATINUM.baseRoundTrip +
-            extraPassengers * PRICING.PLATINUM.extraPassengerRoundTrip;
-
-        }
-
+          : PLATINUM_PRICING.base_oneway +
+            extra *
+            PLATINUM_PRICING.extra_oneway;
       }
-
     }
 
-    return total;
 
+    setTotalPrice(price);
+
+  }, [
+    serviceType,
+    passengers,
+    roundTrip
+  ]);
+
+
+  // =======================================================
+  // VALIDATION
+  // =======================================================
+
+  const validateForm = () => {
+
+    if (!fullName.trim()) {
+
+      setErrorMessage(
+        "Please enter passenger name."
+      );
+
+      return false;
+    }
+
+
+    if (!arrivalDate) {
+
+      setErrorMessage(
+        "Please select arrival date."
+      );
+
+      return false;
+    }
+
+
+    if (!arrivalOrigin.trim()) {
+
+      setErrorMessage(
+        "Please enter the arrival origin."
+      );
+
+      return false;
+    }
+
+
+    if (!destination.trim()) {
+
+      setErrorMessage(
+        "Please enter where you should be taken in Isla Mujeres."
+      );
+
+      return false;
+    }
+
+
+    if (
+      roundTrip &&
+      !departureDate
+    ) {
+
+      setErrorMessage(
+        "Please select return date."
+      );
+
+      return false;
+    }
+
+
+    setErrorMessage("");
+
+    return true;
   };
 
-  const totalPrice = calculateTotal();
 
-  /*
-  ====================================================
-  ENVÍO DE RESERVA A WHATSAPP
-  ====================================================
-  */
+  // =======================================================
+  // REGISTER OPPORTUNITY
+  // =======================================================
 
-  const sendToWhatsApp = () => {
+  const registerOpportunity = async () => {
 
-    const phoneNumber = "5219982594817"; // CAMBIAR
+    const requestDate =
+      new Date().toLocaleString();
 
-    const message = `
-AGI TOURS & TRANSFERS
-ISLA MUJERES EXPRESS
-AIRPORT TRANSFER REQUEST
 
-Request date: ${requestDate}
+    const opportunity = {
 
-Service: ${serviceType}
-Round trip: ${roundTrip ? "Yes" : "No"}
+      producto:
+        "Isla Mujeres Express",
 
-Passenger name: ${fullName}
-Phone: ${phone}
-Email: ${email}
+      modalidad:
+        roundTrip
+          ? "Round Trip"
+          : "One Way",
 
-Passengers: ${passengers}
-Baby seat: ${babySeat ? "Yes" : "No"}
+      nombre:
+        fullName.trim(),
 
-ARRIVAL
-Date: ${arrivalDate}
-ETA: ${arrivalTime}
-Airline: ${arrivalAirline}
-Flight: ${arrivalFlight}
-Origin: ${arrivalOrigin}
-Destination: ${destination}
+      whatsapp:
+        phone.trim(),
 
-${roundTrip ? `
+      email:
+        email.trim(),
 
-DEPARTURE
-Date: ${departureDate}
-ETD: ${departureTime}
-Airline: ${departureAirline}
-Flight: ${departureFlight}
+      estado:
+        "Nueva",
 
-` : ""}
+      responsable:
+        "AGI",
 
-Estimated total: $${totalPrice} USD
-`;
+      observaciones:
+        [
+          `Request date: ${requestDate}`,
 
-    const encodedMessage = encodeURIComponent(message);
+          `Service: ${serviceType}`,
 
-    const url = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+          `Trip type: ${
+            roundTrip
+              ? "Round Trip"
+              : "One Way"
+          }`,
 
-    window.open(url, "_blank");
+          `Passengers: ${passengers}`,
 
+          `Baby seat: ${
+            babySeat
+              ? "Yes"
+              : "No"
+          }`,
+
+          `Arrival date: ${arrivalDate}`,
+
+          `Arrival time: ${
+            arrivalTime ||
+            "Not provided"
+          }`,
+
+          `Arrival airline: ${
+            arrivalAirline ||
+            "Not provided"
+          }`,
+
+          `Arrival flight: ${
+            arrivalFlight ||
+            "Not provided"
+          }`,
+
+          `Origin: ${arrivalOrigin}`,
+
+          `Isla Mujeres accommodation/destination: ${destination}`,
+
+          roundTrip
+            ? `Return date: ${departureDate}`
+            : "",
+
+          roundTrip
+            ? `Return time: ${
+                departureTime ||
+                "Not provided"
+              }`
+            : "",
+
+          roundTrip
+            ? `Return airline: ${
+                departureAirline ||
+                "Not provided"
+              }`
+            : "",
+
+          roundTrip
+            ? `Return flight: ${
+                departureFlight ||
+                "Not provided"
+              }`
+            : "",
+
+          `Quoted price: $${totalPrice} USD`
+        ]
+        .filter(Boolean)
+        .join(" | ")
+    };
+
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "text/plain;charset=utf-8"
+          },
+
+          body:
+            JSON.stringify(
+              opportunity
+            )
+        }
+      );
+
+
+    const responseText =
+      await response.text();
+
+
+    let result;
+
+    try {
+
+      result =
+        JSON.parse(
+          responseText
+        );
+
+    } catch (error) {
+
+      throw new Error(
+        "The API returned an unexpected response."
+      );
+    }
+
+
+    if (
+      !result.success ||
+      !result.opportunityId
+    ) {
+
+      throw new Error(
+        result.error ||
+        "The request could not be registered."
+      );
+    }
+
+
+    return result.opportunityId;
   };
 
-  /*
-  ====================================================
-  INTERFAZ DEL FORMULARIO
-  ====================================================
-  */
+
+  // =======================================================
+  // WHATSAPP
+  // =======================================================
+
+  const sendToWhatsApp = async () => {
+
+    if (!validateForm()) {
+      return;
+    }
+
+
+    if (isSending) {
+      return;
+    }
+
+
+    setIsSending(true);
+    setErrorMessage("");
+
+
+    try {
+
+      const opportunityId =
+        await registerOpportunity();
+
+
+      const phoneNumber =
+        "529982594817";
+
+
+      const message =
+        buildWhatsAppMessage({
+
+          requestDate:
+            new Date().toLocaleString(),
+
+          opportunityId,
+
+          serviceType,
+
+          roundTrip,
+
+          fullName,
+
+          phone,
+
+          email,
+
+          passengers,
+
+          babySeat,
+
+          arrivalDate,
+
+          arrivalTime,
+
+          arrivalAirline,
+
+          arrivalFlight,
+
+          arrivalOrigin,
+
+          destination,
+
+          departureDate,
+
+          departureTime,
+
+          departureAirline,
+
+          departureFlight,
+
+          totalPrice
+        });
+
+
+      const url =
+        `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+          message
+        )}`;
+
+
+      window.open(
+        url,
+        "_blank"
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "AGI Mobility Platform:",
+        error
+      );
+
+
+      setErrorMessage(
+        "We could not register your request. Please try again or contact AGI directly via WhatsApp."
+      );
+
+
+    } finally {
+
+      setIsSending(false);
+    }
+  };
+
+
+  // =======================================================
+  // USER INTERFACE
+  // =======================================================
 
   return (
 
     <div
       style={{
         maxWidth: "700px",
-        margin: "auto",
-        padding: "20px",
-        fontFamily: "Arial"
+        margin: "auto"
       }}
     >
 
-      <SectionCard title="Service Type">
+      {/* =================================================
+          TITLE
+      ================================================== */}
 
-        <label>
-          <input
-            type="radio"
-            value="VIP"
-            checked={serviceType === "VIP"}
-            onChange={(e) => setServiceType(e.target.value)}
-          />
-          VIP Transfer
-        </label>
+      <h2>
+        ISLA MUJERES EXPRESS
+      </h2>
 
-        <br /><br />
 
-        <label>
-          <input
-            type="radio"
-            value="PLATINUM"
-            checked={serviceType === "PLATINUM"}
-            onChange={(e) => setServiceType(e.target.value)}
-          />
-          PLATINUM Private Transfer
-        </label>
+      <p>
+        Please provide the following information
+        to generate your quote; if you accept it,
+        you will be able to quickly book your
+        transfer via WhatsApp.
+      </p>
 
-      </SectionCard>
 
-      <SectionCard title="Trip Type">
+      {/* =================================================
+          SERVICE
+      ================================================== */}
 
-        <label>
-          <input
-            type="checkbox"
-            checked={roundTrip}
-            onChange={(e) => setRoundTrip(e.target.checked)}
-          />
-          Round Trip
-        </label>
+      <h3>
+        Service
+      </h3>
 
-      </SectionCard>
 
-      <SectionCard title="Passenger Information">
+      <select
+        value={serviceType}
+        onChange={(e) =>
+          setServiceType(
+            e.target.value
+          )
+        }
+      >
 
-        <input
-          type="text"
-          placeholder="Full name"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-        />
+        <option value="VIP">
+          VIP
+        </option>
 
-        <br /><br />
+        <option value="PLATINUM">
+          PLATINUM
+        </option>
 
-        <input
-          type="tel"
-          placeholder="Phone number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+      </select>
 
-        <br /><br />
+
+      {/* =================================================
+          TRIP TYPE
+      ================================================== */}
+
+      <h3>
+        Trip Type
+      </h3>
+
+
+      <label>
 
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="radio"
+          name="islaMujeresTripType"
+          checked={!roundTrip}
+          onChange={() =>
+            setRoundTrip(false)
+          }
         />
 
-        <br /><br />
+        {" "}
+        One Way
 
-        <label>Passengers</label>
+      </label>
+
+
+      <br />
+
+
+      <label>
 
         <input
-          type="number"
-          min="1"
-          value={passengers}
-          onChange={(e) => setPassengers(Number(e.target.value))}
+          type="radio"
+          name="islaMujeresTripType"
+          checked={roundTrip}
+          onChange={() =>
+            setRoundTrip(true)
+          }
         />
 
-        <br /><br />
+        {" "}
+        Round Trip
 
-        <label>
-          <input
-            type="checkbox"
-            checked={babySeat}
-            onChange={(e) => setBabySeat(e.target.checked)}
-          />
-          Baby seat required
-        </label>
+      </label>
 
-      </SectionCard>
 
-      <SectionCard title="Arrival Information">
+      {/* =================================================
+          PASSENGER INFORMATION
+      ================================================== */}
+
+      <h3>
+        Passenger Information
+      </h3>
+
+
+      <input
+        placeholder="Full Name"
+        value={fullName}
+        onChange={(e) =>
+          setFullName(
+            e.target.value
+          )
+        }
+      />
+
+
+      <input
+        placeholder="WhatsApp"
+        value={phone}
+        onChange={(e) =>
+          setPhone(
+            e.target.value
+          )
+        }
+      />
+
+
+      <input
+        placeholder="Email"
+        value={email}
+        onChange={(e) =>
+          setEmail(
+            e.target.value
+          )
+        }
+      />
+
+
+      {/* =================================================
+          PASSENGERS
+      ================================================== */}
+
+      <h3>
+        Passengers
+      </h3>
+
+
+      <label>
+        Number of passengers
+      </label>
+
+
+      <input
+        type="number"
+        min="1"
+        value={passengers}
+        onChange={(e) =>
+          setPassengers(
+            parseInt(
+              e.target.value
+            ) || 1
+          )
+        }
+      />
+
+
+      <br />
+      <br />
+
+
+      <label>
 
         <input
-          type="date"
-          value={arrivalDate}
-          onChange={(e) => setArrivalDate(e.target.value)}
+          type="checkbox"
+          checked={babySeat}
+          onChange={(e) =>
+            setBabySeat(
+              e.target.checked
+            )
+          }
         />
 
-        <br /><br />
+        {" "}
+        Baby seat required
 
-        <input
-          type="time"
-          value={arrivalTime}
-          onChange={(e) => setArrivalTime(e.target.value)}
-        />
+      </label>
 
-        <br /><br />
 
-        <input
-          type="text"
-          placeholder="Airline"
-          value={arrivalAirline}
-          onChange={(e) => setArrivalAirline(e.target.value)}
-        />
+      {/* =================================================
+          OUTBOUND TRIP
+      ================================================== */}
 
-        <br /><br />
+      <h3>
+        Inbound Flight
+      </h3>
 
-        <input
-          type="text"
-          placeholder="Flight number"
-          value={arrivalFlight}
-          onChange={(e) => setArrivalFlight(e.target.value)}
-        />
 
-        <br /><br />
+      <label>
+        Arrival date
+      </label>
 
-        <input
-          type="text"
-          placeholder="Origin"
-          value={arrivalOrigin}
-          onChange={(e) => setArrivalOrigin(e.target.value)}
-        />
 
-        <br /><br />
+      <input
+        type="date"
+        value={arrivalDate}
+        onChange={(e) =>
+          setArrivalDate(
+            e.target.value
+          )
+        }
+      />
 
-        <input
-          type="text"
-          placeholder="Hotel / Destination"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-        />
 
-      </SectionCard>
+      <label>
+        Arrival time
+      </label>
+
+
+      <input
+        type="time"
+        value={arrivalTime}
+        onChange={(e) =>
+          setArrivalTime(
+            e.target.value
+          )
+        }
+      />
+
+
+      <input
+        placeholder="Airline"
+        value={arrivalAirline}
+        onChange={(e) =>
+          setArrivalAirline(
+            e.target.value
+          )
+        }
+      />
+
+
+      <input
+        placeholder="Flight"
+        value={arrivalFlight}
+        onChange={(e) =>
+          setArrivalFlight(
+            e.target.value
+          )
+        }
+      />
+
+
+      <input
+        placeholder="Origin"
+        value={arrivalOrigin}
+        onChange={(e) =>
+          setArrivalOrigin(
+            e.target.value
+          )
+        }
+      />
+
+
+      {/* =================================================
+          DESTINATION
+      ================================================== */}
+
+      <h3>
+        Where should we take you in Isla Mujeres?
+      </h3>
+
+
+      <input
+        placeholder="Hotel, accommodation or private address"
+        value={destination}
+        onChange={(e) =>
+          setDestination(
+            e.target.value
+          )
+        }
+      />
+
+
+      {/* =================================================
+          RETURN TRIP
+      ================================================== */}
 
       {roundTrip && (
 
-        <SectionCard title="Departure Information">
+        <>
+
+          <h3>
+            Return Trip
+          </h3>
+
+
+          <label>
+            Return date
+          </label>
+
 
           <input
             type="date"
             value={departureDate}
-            onChange={(e) => setDepartureDate(e.target.value)}
+            onChange={(e) =>
+              setDepartureDate(
+                e.target.value
+              )
+            }
           />
 
-          <br /><br />
+
+          <label>
+            Return time
+          </label>
+
 
           <input
             type="time"
             value={departureTime}
-            onChange={(e) => setDepartureTime(e.target.value)}
+            onChange={(e) =>
+              setDepartureTime(
+                e.target.value
+              )
+            }
           />
 
-          <br /><br />
 
           <input
-            type="text"
-            placeholder="Airline"
+            placeholder="Return airline"
             value={departureAirline}
-            onChange={(e) => setDepartureAirline(e.target.value)}
+            onChange={(e) =>
+              setDepartureAirline(
+                e.target.value
+              )
+            }
           />
 
-          <br /><br />
 
           <input
-            type="text"
-            placeholder="Flight number"
+            placeholder="Return flight"
             value={departureFlight}
-            onChange={(e) => setDepartureFlight(e.target.value)}
+            onChange={(e) =>
+              setDepartureFlight(
+                e.target.value
+              )
+            }
           />
 
-        </SectionCard>
+        </>
 
       )}
 
-      <SectionCard title="Estimated Price">
 
-        <h2>${totalPrice} USD</h2>
+      {/* =================================================
+          QUOTE
+      ================================================== */}
 
-        <button
-          onClick={sendToWhatsApp}
+      <h2>
+        Total: ${totalPrice} USD
+      </h2>
+
+
+      {/* =================================================
+          ERROR
+      ================================================== */}
+
+      {errorMessage && (
+
+        <p
           style={{
-            background: "#25D366",
-            color: "white",
-            padding: "12px 20px",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "16px"
+            color: "red",
+            fontWeight: "bold"
           }}
         >
-          Reserve via WhatsApp
-        </button>
+          {errorMessage}
+        </p>
 
-      </SectionCard>
+      )}
+
+
+      {/* =================================================
+          ACTION
+      ================================================== */}
+
+      <button
+        onClick={
+          sendToWhatsApp
+        }
+        disabled={isSending}
+      >
+
+        {isSending
+          ? "Registering request..."
+          : "Reserve via WhatsApp"}
+
+      </button>
 
     </div>
-
   );
-
 }
