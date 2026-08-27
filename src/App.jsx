@@ -119,7 +119,7 @@ function App() {
                 }
               >
 
-                Explore &amp; Quote
+                Instant Quote
 
               </button>
 
@@ -153,9 +153,7 @@ function App() {
 
               <p className="agi-product-description">
 
-                Any origin. Any destination.
-                Personalized transportation
-                solutions prepared by AGI TOURS.
+                Any origin. Any destination.                
 
               </p>
 
@@ -332,10 +330,75 @@ function App() {
       <Landing />
 
       <footer className="agi-footer">
+    
+        <div className="agi-footer-contact">
+
+        <div>
+          Calle Los Olivos, SM 310 MZ 66 Lt. 93,
+          Cancún, Quintana Roo, México
+        </div>
+
+        <div>
+          <a href="mailto:agitours@agitours.com">
+            agitours@agitours.com
+          </a>
+        </div>
+
+        <div>
+          +52 998-8872359 / 998-8876967 / 998-8840060
+        </div>
+
+      </div>
+
+
+      <div className="agi-footer-social">
+
+        <div>
+          Follow Us
+        </div>
+
+        <div>
+
+          <a
+            href="https://facebook.com/Agitours"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Facebook
+          </a>
+
+          {" | "}
+
+          <a
+            href="https://instagram.com/agitourscancun"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Instagram
+          </a>
+
+          {" | "}
+
+          <a
+            href="https://www.tripadvisor.com.mx/Attraction_Review-g150807-d4556297-Reviews-AGI_Tours_Transfers-Cancun_Yucatan_Peninsula.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            TripAdvisor
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <div className="agi-footer-platform">
 
         AGI Mobility Platform by RdeJCS
 
-      </footer>
+      </div>
+
+    </footer>
 
     </div>
 
