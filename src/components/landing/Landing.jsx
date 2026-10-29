@@ -82,9 +82,9 @@ export default function Landing({ onSelectProduct }) {
           }}
         >
 
-          <h2>
+          <h1>
             ISLA MUJERES EXPRESS
-          </h2>
+          </h1>
 
           <p>
             Cancun airport to Isla Mujeres transfer service.

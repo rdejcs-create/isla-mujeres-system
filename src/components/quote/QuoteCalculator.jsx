@@ -9,6 +9,12 @@ import {
   buildWhatsAppMessage
 } from "../../utils/whatsappMessage";
 
+// <-- NUEVO
+import {
+  getOrCreateRequestId,
+  clearRequestId
+} from "../../utils/requestId";
+
 
 /*
  * =========================================================
@@ -51,6 +57,10 @@ import {
 
 const API_URL =
   "https://script.google.com/macros/s/AKfycbyp9uoH100kAUxfKjx4sI6fOnt38FIjZYl-5OgjThh0Q636CXW3LSKz900kCO8zLzPK/exec";
+
+// <-- NUEVO
+const REQUEST_STORAGE_KEY =
+  "agiIslaMujeresExpress.lastRequest";
 
 
 // =========================================================
@@ -464,11 +474,29 @@ export default function QuoteCalculator() {
               }`
             : "",
 
-          `Quoted price: $${totalPrice} USD`
+          `USD $${totalPrice}`
         ]
         .filter(Boolean)
         .join(" | ")
     };
+
+
+    // -----------------------------------------------------
+    // Request ID estable por firma de la solicitud.
+    // El backend deduplica por esta columna (AH).
+    // <-- NUEVO
+    // -----------------------------------------------------
+
+    const requestSignature =
+      JSON.stringify(opportunity);
+
+    const requestId =
+      getOrCreateRequestId(
+        REQUEST_STORAGE_KEY,
+        requestSignature
+      );
+
+    opportunity.requestId = requestId;
 
 
     const response =
@@ -521,6 +549,15 @@ export default function QuoteCalculator() {
         "The request could not be registered."
       );
     }
+
+
+    // <-- NUEVO
+    // Limpiar el requestId guardado solo si es el
+    // que se acaba de confirmar.
+    clearRequestId(
+      REQUEST_STORAGE_KEY,
+      requestId
+    );
 
 
     /*
@@ -1329,11 +1366,15 @@ export default function QuoteCalculator() {
   </span>
 
   <span className="agi-total-price">
-    Quoted price: ${totalPrice} USD
+    USD ${totalPrice}
   </span>
 
   <p className="agi-note">
-    I understand that this request is subject to confirmation by AGI TOURS.
+    This request is subject to confirmation
+    by AGI TOURS. An AGI TOURS representative
+    will review your request and contact you
+    via WhatsApp with a personalized quote
+    and payment information.
   </p>
 
 </div>

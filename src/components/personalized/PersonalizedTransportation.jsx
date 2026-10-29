@@ -4,6 +4,12 @@ import {
   buildPersonalizedWhatsAppMessage
 } from "../../utils/whatsappMessage";
 
+// <-- NUEVO
+import {
+  getOrCreateRequestId,
+  clearRequestId
+} from "../../utils/requestId";
+
 /*
  * =========================================================
  * AGI MOBILITY PLATFORM
@@ -22,6 +28,10 @@ import {
 
 const API_URL =
   "https://script.google.com/macros/s/AKfycbyp9uoH100kAUxfKjx4sI6fOnt38FIjZYl-5OgjThh0Q636CXW3LSKz900kCO8zLzPK/exec";
+
+// <-- NUEVO
+const REQUEST_STORAGE_KEY =
+  "agiPersonalizedTransportation.lastRequest";
 
 
 // =========================================================
@@ -258,6 +268,24 @@ export default function PersonalizedTransportation() {
     };
 
 
+    // -----------------------------------------------------
+    // Request ID estable por firma de la solicitud.
+    // El backend deduplica por esta columna (AH).
+    // <-- NUEVO
+    // -----------------------------------------------------
+
+    const requestSignature =
+      JSON.stringify(opportunity);
+
+    const requestId =
+      getOrCreateRequestId(
+        REQUEST_STORAGE_KEY,
+        requestSignature
+      );
+
+    opportunity.requestId = requestId;
+
+
     const response =
       await fetch(
         API_URL,
@@ -308,6 +336,15 @@ export default function PersonalizedTransportation() {
         "The request could not be registered."
       );
     }
+
+
+    // <-- NUEVO
+    // Limpiar el requestId guardado solo si es el
+    // que se acaba de confirmar.
+    clearRequestId(
+      REQUEST_STORAGE_KEY,
+      requestId
+    );
 
 
     return result.opportunityId;
@@ -779,9 +816,11 @@ export default function PersonalizedTransportation() {
       ================================================== */}
 
       <p>
-        No obligation. An AGI TOURS representative
-        will review your request and contact you
-        via WhatsApp with a personalized quote.
+         This request is subject to confirmation
+         by AGI TOURS. An AGI TOURS representative
+         will review your request and contact you
+         via WhatsApp with a personalized quote
+         and payment information.
       </p>
 
     </div>

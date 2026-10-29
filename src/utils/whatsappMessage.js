@@ -226,7 +226,7 @@ export function buildWhatsAppMessage({
 
     "",
 
-    "I understand that this request is subject to confirmation by AGI TOURS."
+    "This request is subject to confirmation by AGI TOURS. An AGI TOURS representative will review your request and contact you via WhatsApp with a personalized quote and payment information."
 
   );
 
@@ -390,7 +390,7 @@ export function buildPersonalizedWhatsAppMessage({
 
     "",
 
-    "No obligation. An AGI TOURS representative will review this request and prepare a personalized quote."
+    "This request is subject to confirmation by AGI TOURS. An AGI TOURS representative will review your request and contact you via WhatsApp with a personalized quote and payment information."
 
   );
 
