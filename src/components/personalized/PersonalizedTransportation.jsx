@@ -4,7 +4,6 @@ import {
   buildPersonalizedWhatsAppMessage
 } from "../../utils/whatsappMessage";
 
-// <-- NUEVO
 import {
   getOrCreateRequestId,
   clearRequestId
@@ -20,6 +19,10 @@ import {
  *
  * No automatic price calculation.
  * Personalized quote prepared by AGI TOURS.
+ *
+ * Nota: este producto NO muestra desglose de IVA porque
+ * no tiene precio automático. El texto del disclaimer
+ * indica que la cotización final incluirá IVA.
  */
 
 // =========================================================
@@ -29,7 +32,6 @@ import {
 const API_URL =
   "https://script.google.com/macros/s/AKfycbyp9uoH100kAUxfKjx4sI6fOnt38FIjZYl-5OgjThh0Q636CXW3LSKz900kCO8zLzPK/exec";
 
-// <-- NUEVO
 const REQUEST_STORAGE_KEY =
   "agiPersonalizedTransportation.lastRequest";
 
@@ -122,60 +124,31 @@ export default function PersonalizedTransportation() {
   const validateForm = () => {
 
     if (!fullName.trim()) {
-
-      setErrorMessage(
-        "Please enter passenger name."
-      );
-
+      setErrorMessage("Please enter passenger name.");
       return false;
     }
-
 
     if (!serviceDate) {
-
-      setErrorMessage(
-        "Please select service date."
-      );
-
+      setErrorMessage("Please select service date.");
       return false;
     }
-
 
     if (!origin.trim()) {
-
-      setErrorMessage(
-        "Please enter the origin."
-      );
-
+      setErrorMessage("Please enter the origin.");
       return false;
     }
-
 
     if (!destination.trim()) {
-
-      setErrorMessage(
-        "Please enter the destination."
-      );
-
+      setErrorMessage("Please enter the destination.");
       return false;
     }
 
-
-    if (
-      roundTrip &&
-      !returnDate
-    ) {
-
-      setErrorMessage(
-        "Please select return date."
-      );
-
+    if (roundTrip && !returnDate) {
+      setErrorMessage("Please select return date.");
       return false;
     }
-
 
     setErrorMessage("");
-
     return true;
   };
 
@@ -186,166 +159,85 @@ export default function PersonalizedTransportation() {
 
   const registerOpportunity = async () => {
 
-    const requestDate =
-      new Date().toLocaleString();
-
+    const requestDate = new Date().toLocaleString();
 
     const opportunity = {
 
-      producto:
-        "Personalized Transportation",
+      producto: "Personalized Transportation",
 
-      modalidad:
-        roundTrip
-          ? "Round Trip"
-          : "One Way",
+      modalidad: roundTrip ? "Round Trip" : "One Way",
 
-      nombre:
-        fullName.trim(),
+      nombre: fullName.trim(),
 
-      whatsapp:
-        phone.trim(),
+      whatsapp: phone.trim(),
 
-      email:
-        email.trim(),
+      email: email.trim(),
 
-      pasajeros:
-        passengers,
+      pasajeros: passengers,
 
-      estado:
-        "Nueva",
+      estado: "Nueva",
 
-      responsable:
-        "AGI",
+      responsable: "AGI",
 
-      observaciones:
-        [
-          `Request date: ${requestDate}`,
-
-          `Trip type: ${
-            roundTrip
-              ? "Round Trip"
-              : "One Way"
-          }`,
-
-          `Passengers: ${passengers}`,
-
-          `Baby seat: ${
-            babySeat
-              ? "Yes"
-              : "No"
-          }`,
-
-          `Service date: ${serviceDate}`,
-
-          `Service time: ${
-            serviceTime ||
-            "Not provided"
-          }`,
-
-          `Origin: ${origin}`,
-
-          `Destination: ${destination}`,
-
-          roundTrip
-            ? `Return date: ${returnDate}`
-            : "",
-
-          roundTrip
-            ? `Return time: ${
-                returnTime ||
-                "Not provided"
-              }`
-            : "",
-
-          `Additional details: ${
-            additionalDetails.trim() ||
-            "None"
-          }`
-        ]
+      observaciones: [
+        `Request date: ${requestDate}`,
+        `Trip type: ${roundTrip ? "Round Trip" : "One Way"}`,
+        `Passengers: ${passengers}`,
+        `Baby seat: ${babySeat ? "Yes" : "No"}`,
+        `Service date: ${serviceDate}`,
+        `Service time: ${serviceTime || "Not provided"}`,
+        `Origin: ${origin}`,
+        `Destination: ${destination}`,
+        roundTrip ? `Return date: ${returnDate}` : "",
+        roundTrip ? `Return time: ${returnTime || "Not provided"}` : "",
+        `Additional details: ${additionalDetails.trim() || "None"}`,
+        // <-- NUEVO: nota de IVA en observaciones
+        "Quote pending: final amount will include 16% IVA"
+      ]
         .filter(Boolean)
         .join(" | ")
     };
 
 
-    // -----------------------------------------------------
-    // Request ID estable por firma de la solicitud.
-    // El backend deduplica por esta columna (AH).
-    // <-- NUEVO
-    // -----------------------------------------------------
+    // Request ID estable por firma
+    const requestSignature = JSON.stringify(opportunity);
 
-    const requestSignature =
-      JSON.stringify(opportunity);
-
-    const requestId =
-      getOrCreateRequestId(
-        REQUEST_STORAGE_KEY,
-        requestSignature
-      );
+    const requestId = getOrCreateRequestId(
+      REQUEST_STORAGE_KEY,
+      requestSignature
+    );
 
     opportunity.requestId = requestId;
 
 
-    const response =
-      await fetch(
-        API_URL,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "text/plain;charset=utf-8"
-          },
-
-          body:
-            JSON.stringify(
-              opportunity
-            )
-        }
-      );
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(opportunity)
+    });
 
 
-    const responseText =
-      await response.text();
-
+    const responseText = await response.text();
 
     let result;
 
     try {
-
-      result =
-        JSON.parse(
-          responseText
-        );
-
+      result = JSON.parse(responseText);
     } catch (error) {
+      throw new Error("The API returned an unexpected response.");
+    }
 
+
+    if (!result.success || !result.opportunityId) {
       throw new Error(
-        "The API returned an unexpected response."
+        result.error || "The request could not be registered."
       );
     }
 
 
-    if (
-      !result.success ||
-      !result.opportunityId
-    ) {
-
-      throw new Error(
-        result.error ||
-        "The request could not be registered."
-      );
-    }
-
-
-    // <-- NUEVO
-    // Limpiar el requestId guardado solo si es el
-    // que se acaba de confirmar.
-    clearRequestId(
-      REQUEST_STORAGE_KEY,
-      requestId
-    );
-
+    clearRequestId(REQUEST_STORAGE_KEY, requestId);
 
     return result.opportunityId;
   };
@@ -357,111 +249,51 @@ export default function PersonalizedTransportation() {
 
   const sendToWhatsApp = async () => {
 
-    if (!validateForm()) {
-      return;
-    }
-
-
-    if (isSending) {
-      return;
-    }
-
+    if (!validateForm()) return;
+    if (isSending) return;
 
     setIsSending(true);
     setErrorMessage("");
 
-
     try {
 
-      // ---------------------------------------------------
-      // Register request first.
-      // ---------------------------------------------------
+      const opportunityId = await registerOpportunity();
 
-      const opportunityId =
-        await registerOpportunity();
+      const message = buildPersonalizedWhatsAppMessage({
+        opportunityId,
+        roundTrip,
+        fullName,
+        phone,
+        email,
+        passengers,
+        babySeat,
+        serviceDate,
+        serviceTime,
+        origin,
+        destination,
+        returnDate,
+        returnTime,
+        additionalDetails
+      });
 
-
-      // ---------------------------------------------------
-      // Build WhatsApp message.
-      // ---------------------------------------------------
-
-      const message =
-        buildPersonalizedWhatsAppMessage({
-
-          opportunityId,
-
-          roundTrip,
-
-          fullName,
-
-          phone,
-
-          email,
-
-          passengers,
-
-          babySeat,
-
-          serviceDate,
-
-          serviceTime,
-
-          origin,
-
-          destination,
-
-          returnDate,
-
-          returnTime,
-
-          additionalDetails
-
-        });
-
-
-      // ---------------------------------------------------
-      // AGI TOURS WhatsApp number.
-      // ---------------------------------------------------
-
+      // <-- NUEVO: override por env var
       const phoneNumber =
-        "529988457161";
-
-
-      // ---------------------------------------------------
-      // WhatsApp URL.
-      // ---------------------------------------------------
+        import.meta.env.VITE_WHATSAPP_NUMBER || "529988457161";
 
       const url =
-        `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-          message
-        )}`;
+        `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
-
-      // ---------------------------------------------------
-      // Open WhatsApp.
-      // ---------------------------------------------------
-
-      window.open(
-        url,
-        "_blank"
-      );
-
+      window.open(url, "_blank");
 
     } catch (error) {
 
-      console.error(
-        "AGI Mobility Platform:",
-        error
-      );
-
+      console.error("AGI Mobility Platform:", error);
 
       setErrorMessage(
         "We could not register your request. Please try again or contact AGI directly via WhatsApp."
       );
 
-
     } finally {
-
       setIsSending(false);
     }
   };
@@ -480,347 +312,173 @@ export default function PersonalizedTransportation() {
       }}
     >
 
-      {/* =================================================
-          TITLE
-      ================================================== */}
+      <h2>PERSONALIZED TRANSPORTATION</h2>
 
-      <h2>
-        PERSONALIZED TRANSPORTATION
-      </h2>
-
-
-      <p>
-        Any origin. Any destination.
-      </p>
-
+      <p>Any origin. Any destination.</p>
 
       <p>
         Tell us what you need, and AGI TOURS
         will prepare a personalized transportation
-        quote for you — with no obligation.
+        quote for you.
       </p>
 
 
-      {/* =================================================
-          TRIP TYPE
-      ================================================== */}
-
-      <h3>
-        Trip Type
-      </h3>
-
+      <h3>Trip Type</h3>
 
       <label>
-
         <input
           type="radio"
           name="personalizedTripType"
           checked={!roundTrip}
-          onChange={() =>
-            setRoundTrip(false)
-          }
+          onChange={() => setRoundTrip(false)}
         />
-
-        {" "}
-        One Way
-
+        {" "}One Way
       </label>
-
 
       <br />
 
-
       <label>
-
         <input
           type="radio"
           name="personalizedTripType"
           checked={roundTrip}
-          onChange={() =>
-            setRoundTrip(true)
-          }
+          onChange={() => setRoundTrip(true)}
         />
-
-        {" "}
-        Round Trip
-
+        {" "}Round Trip
       </label>
 
 
-      {/* =================================================
-          PASSENGER INFORMATION
-      ================================================== */}
-
-      <h3>
-        Passenger Information
-      </h3>
-
+      <h3>Passenger Information</h3>
 
       <input
         placeholder="Full Name"
         value={fullName}
-        onChange={(e) =>
-          setFullName(
-            e.target.value
-          )
-        }
+        onChange={(e) => setFullName(e.target.value)}
       />
-
 
       <input
         placeholder="WhatsApp Number"
         value={phone}
-        onChange={(e) =>
-          setPhone(
-            e.target.value
-          )
-        }
+        onChange={(e) => setPhone(e.target.value)}
       />
-
 
       <input
         placeholder="Email Address"
         value={email}
-        onChange={(e) =>
-          setEmail(
-            e.target.value
-          )
-        }
+        onChange={(e) => setEmail(e.target.value)}
       />
 
 
-      {/* =================================================
-          PASSENGERS
-      ================================================== */}
+      <h3>Passengers</h3>
 
-      <h3>
-        Passengers
-      </h3>
-
-
-      <label>
-        Number of passengers
-      </label>
-
+      <label>Number of passengers</label>
 
       <input
         type="number"
         min="1"
         value={passengers}
-        onChange={(e) =>
-          setPassengers(
-            parseInt(
-              e.target.value
-            ) || 1
-          )
-        }
+        onChange={(e) => setPassengers(parseInt(e.target.value) || 1)}
       />
 
-
-      <br />
-      <br />
-
+      <br /><br />
 
       <label>
-
         <input
           type="checkbox"
           checked={babySeat}
-          onChange={(e) =>
-            setBabySeat(
-              e.target.checked
-            )
-          }
+          onChange={(e) => setBabySeat(e.target.checked)}
         />
-
-        {" "}
-        Baby seat required
-
+        {" "}Baby seat required
       </label>
 
 
-      {/* =================================================
-          SERVICE DETAILS
-      ================================================== */}
+      <h3>Service Details</h3>
 
-      <h3>
-        Service Details
-      </h3>
-
-
-      <label>
-        Service date
-      </label>
-
-
+      <label>Service date</label>
       <input
         type="date"
         value={serviceDate}
-        onChange={(e) =>
-          setServiceDate(
-            e.target.value
-          )
-        }
+        onChange={(e) => setServiceDate(e.target.value)}
       />
 
-
-      <label>
-        Preferred time
-      </label>
-
-
+      <label>Preferred time</label>
       <input
         type="time"
         value={serviceTime}
-        onChange={(e) =>
-          setServiceTime(
-            e.target.value
-          )
-        }
+        onChange={(e) => setServiceTime(e.target.value)}
       />
-
 
       <input
         placeholder="Origin"
         value={origin}
-        onChange={(e) =>
-          setOrigin(
-            e.target.value
-          )
-        }
+        onChange={(e) => setOrigin(e.target.value)}
       />
-
 
       <input
         placeholder="Destination"
         value={destination}
-        onChange={(e) =>
-          setDestination(
-            e.target.value
-          )
-        }
+        onChange={(e) => setDestination(e.target.value)}
       />
 
 
-      {/* =================================================
-          RETURN TRIP
-      ================================================== */}
-
       {roundTrip && (
-
         <>
+          <h3>Return Trip</h3>
 
-          <h3>
-            Return Trip
-          </h3>
-
-
-          <label>
-            Return date
-          </label>
-
-
+          <label>Return date</label>
           <input
             type="date"
             value={returnDate}
-            onChange={(e) =>
-              setReturnDate(
-                e.target.value
-              )
-            }
+            onChange={(e) => setReturnDate(e.target.value)}
           />
 
-
-          <label>
-            Return time
-          </label>
-
-
+          <label>Return time</label>
           <input
             type="time"
             value={returnTime}
-            onChange={(e) =>
-              setReturnTime(
-                e.target.value
-              )
-            }
+            onChange={(e) => setReturnTime(e.target.value)}
           />
-
         </>
-
       )}
 
 
-      {/* =================================================
-          ADDITIONAL INFORMATION
-      ================================================== */}
-
-      <h3>
-        Additional Information
-      </h3>
-
+      <h3>Additional Information</h3>
 
       <textarea
         placeholder="Anything else we should know?"
         value={additionalDetails}
-        onChange={(e) =>
-          setAdditionalDetails(
-            e.target.value
-          )
-        }
+        onChange={(e) => setAdditionalDetails(e.target.value)}
         rows="5"
-        style={{
-          width: "100%"
-        }}
+        style={{ width: "100%" }}
       />
 
 
-      {/* =================================================
-          ERROR
-      ================================================== */}
-
       {errorMessage && (
-
-        <p
-          style={{
-            color: "red",
-            fontWeight: "bold"
-          }}
-        >
+        <p style={{ color: "red", fontWeight: "bold" }}>
           {errorMessage}
         </p>
-
       )}
 
 
-      {/* =================================================
-          ACTION
-      ================================================== */}
-
       <button
-        onClick={
-          sendToWhatsApp
-        }
+        type="button"
+        onClick={sendToWhatsApp}
         disabled={isSending}
       >
-
         {isSending
           ? "Registering request..."
           : "Request a Personalized Quote"}
-
       </button>
 
 
-      {/* =================================================
-          DISCLAIMER
-      ================================================== */}
-
+      {/* <-- NUEVO: disclaimer con mención de IVA */}
       <p>
          This request is subject to confirmation
-         by AGI TOURS. An AGI TOURS representative
-         will review your request and contact you
-         via WhatsApp with a personalized quote
-         and payment information.
+         by AGI TOURS. Your personalized quote will
+         include 16% IVA (Mexican VAT). An AGI TOURS
+         representative will review your request and
+         contact you via WhatsApp with a personalized
+         quote and payment information.
       </p>
 
     </div>

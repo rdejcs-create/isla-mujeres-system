@@ -1378,3 +1378,27 @@ body {
     font-size: 20px;
   }
 }
+
+/* =========================================================
+   33. TAX BREAKDOWN 
+   ========================================================= */
+ 
+.agi-iva-breakdown {
+  margin: 12px 0;
+}
+
+.agi-iva-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.agi-iva-total {
+  border-top: 1px solid #cbd5e1;
+  padding-top: 8px;
+  margin-top: 4px;
+  font-weight: 700;
+  font-size: 17px;
+}

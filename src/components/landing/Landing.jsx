@@ -132,8 +132,7 @@ export default function Landing({ onSelectProduct }) {
           </p>
 
           <p>
-            Request a personalized quote
-            with no obligation.
+            Request a personalized quote.
           </p>
 
           <button
