@@ -298,7 +298,7 @@ export default function QuoteCalculator() {
       const opportunityId = await registerOpportunity();
 
       const phoneNumber =
-        import.meta.env.VITE_WHATSAPP_NUMBER || "529982594817";
+        import.meta.env.VITE_WHATSAPP_NUMBER || "529988457161";
 
       const message = buildWhatsAppMessage({
         requestDate: new Date().toLocaleString(),
