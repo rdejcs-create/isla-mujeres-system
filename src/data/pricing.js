@@ -10,13 +10,13 @@ Todas las tarifas del sistema centralizadas.
 */
 
 export const VIP_PRICING = {
-  oneway: 65,
-  round: 109
+  oneway: 56.04,
+  round: 93.97
 };
 
 export const PLATINUM_PRICING = {
-  base_oneway: 500,
-  base_round: 950,
-  extra_oneway: 60,
-  extra_round: 100
+  base_oneway: 431.04,
+  base_round: 818.97,
+  extra_oneway: 51.73,
+  extra_round: 86.22
 };

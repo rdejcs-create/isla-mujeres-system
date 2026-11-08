@@ -298,7 +298,7 @@ export default function QuoteCalculator() {
       const opportunityId = await registerOpportunity();
 
       const phoneNumber =
-        import.meta.env.VITE_WHATSAPP_NUMBER || "529988457161";
+        import.meta.env.VITE_WHATSAPP_NUMBER || "529982594817";
 
       const message = buildWhatsAppMessage({
         requestDate: new Date().toLocaleString(),
@@ -675,10 +675,8 @@ export default function QuoteCalculator() {
         </div>
 
         <p className="agi-note">
-          Prices shown are before taxes. IVA (16%) is added
-          to calculate the total. Final amount in Mexican Pesos
-          may vary according to the exchange rate at the time
-          of payment.
+          Prices shown as subtotal are before taxes. IVA (16%)
+          is added to calculate the total.
         </p>
 
         <p className="agi-note">

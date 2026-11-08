@@ -278,7 +278,7 @@ export default function PersonalizedTransportation() {
 
       // <-- NUEVO: override por env var
       const phoneNumber =
-        import.meta.env.VITE_WHATSAPP_NUMBER || "529988457161";
+        import.meta.env.VITE_WHATSAPP_NUMBER || "529982594817";
 
       const url =
         `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;

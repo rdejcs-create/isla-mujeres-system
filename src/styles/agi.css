@@ -168,7 +168,18 @@ body {
 
 }
 
+/* =========================================================
+   4A. LOGO
+   ========================================================= */
 
+.agi-logo {
+  display: block;
+  width: clamp(250px, 28vw, 700px);
+  height: auto;
+  margin: 0 auto 12px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
 /* =========================================================
    5. LANDING CONTAINER
    ========================================================= */
@@ -261,11 +272,13 @@ body {
   margin: 0 auto;
 }
 
-/* Center the last card when it is alone in the final row */
-.agi-product-card:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-  justify-self: center;
-  width: calc((100% - 25px) / 2);
+/* Center the last card when it is alone in the final row (desktop only) */
+@media (min-width: 701px) {
+  .agi-product-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - 25px) / 2);
+  }
 }
 
 /* =========================================================
@@ -313,30 +326,14 @@ body {
    ========================================================= */
 
 .agi-product-image {
-
-  position:
-    relative;
-
-  min-height:
-    240px;
-
-  display:
-    flex;
-
-  align-items:
-    flex-end;
-
-  background-size:
-    cover;
-
-  background-position:
-    center;
-
-  background-repeat:
-    no-repeat;
-
+  position: relative;
+  aspect-ratio: 2 / 1;
+  display: flex;
+  align-items: flex-end;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
-
 
 /* =========================================================
    10. ISLA MUJERES IMAGE
@@ -1139,14 +1136,6 @@ body {
   }
 
 
-  .agi-product-image {
-
-    min-height:
-      210px;
-
-  }
-
-
   .agi-card {
 
     padding:
@@ -1232,15 +1221,7 @@ body {
   }
 
 
-  .agi-product-image {
-
-    min-height:
-      190px;
-
-  }
-
-
-  .agi-product-content {
+   .agi-product-content {
 
     padding:
       18px;
@@ -1261,15 +1242,6 @@ body {
     font-size:
       1.1rem;
 
-  }
-
-  .agi-logo {
-    display: block;
-    width: 100%;
-    max-width: 100px;
-    height: auto;
-    margin: 0 auto 12px;
-    object-fit: contain;
   }
 
 }

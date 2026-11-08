@@ -598,8 +598,8 @@ export default function AirportTransferExpress() {
                   {tripType === "round"
                     ? "Round trip"
                     : "One-way trip."}{" "}
-                  Prices shown are before taxes. IVA (16%) is added to
-                  calculate the total.
+                  Prices shown as subtotal are before taxes. IVA (16%)
+                  is added to calculate the total.
                 </p>
               </>
             ) : (

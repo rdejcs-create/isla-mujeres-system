@@ -4,8 +4,6 @@ import QuoteCalculator from "./components/quote/QuoteCalculator";
 import AirportTransferExpress from "./components/airport-transfer/AirportTransferExpress";
 import PersonalizedTransportation from "./components/personalized/PersonalizedTransportation";
 
-import "./styles/agi.css";
-
 
 
 function PhotoCarousel({ title, imageFolder, description }) {
@@ -103,15 +101,9 @@ function App() {
   const Header = () => (
     <header className="agi-header">
       <img
-        src="/images/Logo%20AGI%202026.png"
-        alt="AGI TOURS & Transfers"
-        className="agi-logo"
-        style={{
-          width: "500px",
-          height: "auto",
-          display: "block",
-          margin: "0 auto 12px",
-        }}
+       src="/images/Logo%20AGI%202026.png"
+       alt="AGI TOURS & Transfers"
+       className="agi-logo"
       />
 
       <h1>AGI TOURS &amp; TRANSFERS</h1>
